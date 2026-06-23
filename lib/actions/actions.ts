@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import crypto from 'crypto';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { loginSchema, registerSchema, forgotPasswordSchema, resetPasswordSchema } from '@/lib/validations/auth.schema';
 import { productSchema, collectionSchema, reviewSchema } from '@/lib/validations/product.schema';
 import { checkoutSchema } from '@/lib/validations/checkout.schema';
@@ -66,7 +67,7 @@ export async function loginAction(
 export async function registerAction(
   prevState: any,
   formData: FormData
-): Promise<ActionResult<{ user: any }>> {
+): Promise<ActionResult<{ user: any; email: string }>> {
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
   const confirmPassword = formData.get('confirmPassword') as string;
@@ -92,7 +93,24 @@ export async function registerAction(
     return { data: null, error: error.message };
   }
 
-  return { data: { user: data.user }, error: null };
+  if (!data.user) {
+    return { data: null, error: 'Registration failed. Please try again.' };
+  }
+
+  // Manually upsert the profile row as a safety fallback in case
+  // the DB trigger (on_auth_user_created) hasn't executed yet.
+  const adminClient = createAdminClient();
+  await adminClient.from('profiles').upsert(
+    {
+      id: data.user.id,
+      email,
+      full_name: fullName,
+      role: 'customer',
+    },
+    { onConflict: 'id', ignoreDuplicates: true }
+  );
+
+  return { data: { user: data.user, email }, error: null };
 }
 
 export async function logoutAction(): Promise<ActionResult<boolean>> {
@@ -112,29 +130,31 @@ export async function forgotPasswordAction(
     return { data: null, error: validation.error.issues[0].message };
   }
 
-  const supabase = createClient();
+  // Use the admin (service-role) client to bypass RLS so we can
+  // check email existence even when the caller is unauthenticated.
+  const adminClient = createAdminClient();
 
-  // Step 1: Verify the email exists in the profiles table
-  const { data: profile, error: profileError } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('email', email)
-    .maybeSingle();
+  // Step 1: Check if the email exists in auth.users via the admin API
+  const { data: usersData, error: listError } = await adminClient.auth.admin.listUsers();
 
-  if (profileError) {
-    console.error('Profile lookup error:', profileError);
+  if (listError) {
+    console.error('Admin listUsers error:', listError);
     return { data: null, error: 'Something went wrong. Please try again.' };
   }
 
-  if (!profile) {
-    // Email is not registered — return a clear, user-friendly error
+  const userExists = usersData.users.some(
+    (u) => u.email?.toLowerCase() === email.toLowerCase()
+  );
+
+  if (!userExists) {
     return {
       data: null,
       error: 'No account found with this email address. Please check and try again.',
     };
   }
 
-  // Step 2: Email exists — send the password reset link
+  // Step 2: Email confirmed — send the password reset link
+  const supabase = createClient();
   const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/reset-password`,
   });

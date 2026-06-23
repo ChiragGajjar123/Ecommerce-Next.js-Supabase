@@ -19,10 +19,8 @@ export default function Register() {
         toast.error(state.error);
       } else if (state.data) {
         toast.success('Registration successful! Please verify your email.');
-        // Extract email to pass to the verification screen
-        const formElement = document.querySelector('form');
-        const emailInput = formElement?.querySelector('input[name="email"]') as HTMLInputElement;
-        const email = emailInput?.value || '';
+        // Email is now returned directly from the server action
+        const email = state.data.email || '';
         router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`);
       }
     }
