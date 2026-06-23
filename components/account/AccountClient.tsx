@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { logoutAction } from '@/lib/actions/actions';
 import { createClient } from '@/lib/supabase/client';
 import { formatPrice } from '@/lib/utils/formatPrice';
+import { ROUTES } from '@/lib/utils/routes';
 import { Order, WishlistItem, Profile } from '@/types';
 import { ProductCard } from '@/components/product/ProductCard';
 
@@ -30,7 +31,7 @@ export function AccountClient({ profile, orders, wishlist, user }: AccountClient
     await logoutAction();
     // Sign out client-side so onAuthStateChange fires and Navbar updates
     await supabase.auth.signOut();
-    router.push('/');
+    router.replace(ROUTES.home);
   };
 
   return (
@@ -57,7 +58,7 @@ export function AccountClient({ profile, orders, wishlist, user }: AccountClient
 
         <div className="flex gap-3">
           {profile.role === 'admin' && (
-            <Button href="/admin" variant="outline" size="sm" className="text-xs uppercase tracking-wider font-bold">
+            <Button href={ROUTES.admin} variant="outline" size="sm" className="text-xs uppercase tracking-wider font-bold">
               <LayoutDashboard className="w-4 h-4 mr-2" /> Admin Dashboard
             </Button>
           )}
@@ -107,7 +108,7 @@ export function AccountClient({ profile, orders, wishlist, user }: AccountClient
                 <div className="py-16 border border-dashed border-border rounded-xl text-center flex flex-col items-center gap-4">
                   <ShoppingBag className="w-10 h-10 text-muted-foreground opacity-50" />
                   <p className="text-xs text-muted-foreground font-semibold uppercase">You haven't placed any orders yet.</p>
-                  <Button href="/products" size="sm" className="text-xs uppercase tracking-wider font-bold">
+                  <Button href={ROUTES.products} size="sm" className="text-xs uppercase tracking-wider font-bold">
                     Shop Products
                   </Button>
                 </div>
@@ -176,7 +177,7 @@ export function AccountClient({ profile, orders, wishlist, user }: AccountClient
                 <div className="py-16 border border-dashed border-border rounded-xl text-center flex flex-col items-center gap-4">
                   <Heart className="w-10 h-10 text-muted-foreground opacity-50" />
                   <p className="text-xs text-muted-foreground font-semibold uppercase">Your wishlist is empty.</p>
-                  <Button href="/products" size="sm" className="text-xs uppercase tracking-wider font-bold">
+                  <Button href={ROUTES.products} size="sm" className="text-xs uppercase tracking-wider font-bold">
                     Browse Catalog
                   </Button>
                 </div>

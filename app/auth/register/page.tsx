@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { toast } from '@/components/ui/Toast';
 import { Logo } from '@/components/layout/Logo';
+import { buildVerifyEmailPath, ROUTES } from '@/lib/utils/routes';
 
 export default function Register() {
   const router = useRouter();
@@ -19,9 +20,7 @@ export default function Register() {
         toast.error(state.error);
       } else if (state.data) {
         toast.success('Registration successful! Please verify your email.');
-        // Email is now returned directly from the server action
-        const email = state.data.email || '';
-        router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`);
+        router.replace(buildVerifyEmailPath(state.data.email || ''));
       }
     }
   }, [state, router]);
@@ -96,7 +95,7 @@ export default function Register() {
         {/* Footer Link */}
         <p className="text-xs text-muted-foreground text-center mt-8 font-medium">
           Already have an account?{' '}
-          <Link href="/auth/login" className="font-bold text-primary hover:text-primary/80 transition-colors uppercase">
+          <Link href={ROUTES.auth.login} className="font-bold text-primary hover:text-primary/80 transition-colors uppercase">
             Log In
           </Link>
         </p>

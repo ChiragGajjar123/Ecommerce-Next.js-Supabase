@@ -11,6 +11,7 @@ import { SideCartDrawer } from './SideCartDrawer';
 import { MobileMenu } from './MobileMenu';
 import { Button } from '@/components/ui/Button';
 import { Logo } from './Logo';
+import { buildProductsSearchPath, ROUTES } from '@/lib/utils/routes';
 
 export function Navbar() {
   const router = useRouter();
@@ -72,13 +73,13 @@ export function Navbar() {
     // Also sign out client-side so onAuthStateChange fires
     // and immediately clears user state in the Navbar
     await supabase.auth.signOut();
-    router.push('/');
+    router.replace(ROUTES.home);
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+      router.push(buildProductsSearchPath(searchQuery));
     }
   };
 
@@ -99,15 +100,15 @@ export function Navbar() {
           </button>
 
           {/* Logo */}
-          <Link href="/" className="flex items-center">
+          <Link href={ROUTES.home} className="flex items-center">
             <Logo className="h-8" />
           </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8 text-xs font-bold uppercase tracking-wider">
-            <Link href="/" className="hover:text-primary transition-colors text-foreground">Home</Link>
-            <Link href="/collections" className="hover:text-primary transition-colors text-foreground">Collections</Link>
-            <Link href="/products" className="hover:text-primary transition-colors text-foreground">Shop All</Link>
+            <Link href={ROUTES.home} className="hover:text-primary transition-colors text-foreground">Home</Link>
+            <Link href={ROUTES.collections} className="hover:text-primary transition-colors text-foreground">Collections</Link>
+            <Link href={ROUTES.products} className="hover:text-primary transition-colors text-foreground">Shop All</Link>
           </nav>
 
           {/* Search Bar */}
@@ -135,11 +136,11 @@ export function Navbar() {
               {user ? (
                 <div className="flex items-center gap-4">
                   {profile?.role === 'admin' && (
-                    <Button href="/admin" variant="ghost" size="sm" className="h-9 px-3 gap-2">
+                    <Button href={ROUTES.admin} variant="ghost" size="sm" className="h-9 px-3 gap-2">
                       <LayoutDashboard className="w-4 h-4 text-primary" /> Admin
                     </Button>
                   )}
-                  <Button href="/account" variant="ghost" size="sm" className="h-9 px-3 gap-2">
+                  <Button href={ROUTES.account} variant="ghost" size="sm" className="h-9 px-3 gap-2">
                     <User className="w-4 h-4" /> Account
                   </Button>
                   <Button variant="ghost" size="sm" onClick={handleLogout} className="h-9 px-3 gap-2 text-destructive hover:bg-destructive/10">
@@ -147,7 +148,7 @@ export function Navbar() {
                   </Button>
                 </div>
               ) : (
-                <Button href="/auth/login" variant="outline" size="sm" className="h-9">
+                <Button href={ROUTES.auth.login} variant="outline" size="sm" className="h-9">
                   Login
                 </Button>
               )}
@@ -155,7 +156,7 @@ export function Navbar() {
 
             {/* Account Icon Mobile */}
             <Link 
-              href={user ? "/account" : "/auth/login"} 
+              href={user ? ROUTES.account : ROUTES.auth.login} 
               className="md:hidden p-2 rounded-lg text-muted-foreground hover:bg-muted"
               aria-label="Account"
             >

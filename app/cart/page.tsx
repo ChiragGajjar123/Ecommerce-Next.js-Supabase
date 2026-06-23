@@ -9,6 +9,7 @@ import { formatPrice } from '@/lib/utils/formatPrice';
 import { Button } from '@/components/ui/Button';
 import { toast } from '@/components/ui/Toast';
 import { createClient } from '@/lib/supabase/client';
+import { ROUTES } from '@/lib/utils/routes';
 
 export default function Cart() {
   const { items, updateQuantity, removeItem, isLoading, fetchCart } = useCart();
@@ -67,7 +68,7 @@ export default function Cart() {
             Looks like you haven't added anything to your cart yet. Explore our latest collections.
           </p>
         </div>
-        <Button href="/products" variant="outline" className="uppercase text-xs font-bold tracking-wider mt-2">
+        <Button href={ROUTES.products} variant="outline" className="uppercase text-xs font-bold tracking-wider mt-2">
           <ArrowLeft className="w-4 h-4 mr-2" /> Start Shopping
         </Button>
       </div>
@@ -228,7 +229,7 @@ export default function Cart() {
           </div>
 
           {/* Back button */}
-          <Link href="/products" className="text-xs font-bold text-muted-foreground hover:text-foreground flex items-center gap-1.5 uppercase tracking-wider mt-4">
+          <Link href={ROUTES.products} className="text-xs font-bold text-muted-foreground hover:text-foreground flex items-center gap-1.5 uppercase tracking-wider mt-4">
             <ArrowLeft className="w-4 h-4" /> Continue Shopping
           </Link>
         </div>
@@ -269,7 +270,7 @@ export default function Cart() {
             </div>
 
             {/* Checkout CTA */}
-            <Button href="/checkout" className="w-full uppercase text-xs font-bold tracking-wider py-4 h-12">
+            <Button href={ROUTES.checkout} className="w-full uppercase text-xs font-bold tracking-wider py-4 h-12">
               Proceed to Checkout
             </Button>
 

@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client';
 import { getOrdersAction, getWishlistAction } from '@/lib/actions/actions';
 import { AccountClient } from '@/components/account/AccountClient';
 import { Profile, Order, WishlistItem } from '@/types';
+import { buildLoginRedirectPath, ROUTES } from '@/lib/utils/routes';
 
 export default function AccountPage() {
   const router = useRouter();
@@ -23,7 +24,7 @@ export default function AccountPage() {
       // 1. Get active session user
       const { data: { user: currentUser } } = await supabase.auth.getUser();
       if (!currentUser) {
-        router.push('/auth/login?redirect=/account');
+        router.replace(buildLoginRedirectPath(ROUTES.account));
         return;
       }
       setUser(currentUser);
@@ -72,7 +73,7 @@ export default function AccountPage() {
         <div className="flex flex-col items-center gap-4 text-center px-4">
           <p className="text-sm font-semibold text-destructive">{error}</p>
           <button
-            onClick={() => router.push('/auth/login')}
+            onClick={() => router.replace(ROUTES.auth.login)}
             className="text-xs font-bold uppercase tracking-wider text-primary hover:underline"
           >
             Go to Login

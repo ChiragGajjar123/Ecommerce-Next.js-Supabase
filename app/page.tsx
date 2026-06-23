@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getFeaturedProductsAction, getFeaturedCollectionsAction } from '@/lib/actions/actions';
 import { ProductCard } from '@/components/product/ProductCard';
 import { Button } from '@/components/ui/Button';
+import { ROUTES } from '@/lib/utils/routes';
 
 export const revalidate = 60; // Cache and revalidate home page every 60s
 
@@ -50,8 +51,8 @@ export default async function Home() {
             Crafted for the modern individual who values high-end materials, architectural silhouettes, and sustainable luxury.
           </p>
           <div className="flex gap-4 mt-2">
-            <Button href="/products">Shop Now</Button>
-            <Button href="/collections" variant="outline">View Collections</Button>
+            <Button href={ROUTES.products}>Shop Now</Button>
+            <Button href={ROUTES.collections} variant="outline">View Collections</Button>
           </div>
         </div>
       </section>
@@ -63,7 +64,7 @@ export default async function Home() {
             <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Curated Styles</span>
             <h2 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-foreground mt-1">Featured Collections</h2>
           </div>
-          <Link href="/collections" className="text-xs font-bold text-primary hover:text-primary/80 flex items-center gap-1 uppercase tracking-wider">
+          <Link href={ROUTES.collections} className="text-xs font-bold text-primary hover:text-primary/80 flex items-center gap-1 uppercase tracking-wider">
             All Collections <ChevronRight className="w-4 h-4" />
           </Link>
         </div>
@@ -105,7 +106,7 @@ export default async function Home() {
               <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Seasonal Picks</span>
               <h2 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-foreground mt-1">Featured Products</h2>
             </div>
-            <Link href="/products" className="text-xs font-bold text-primary hover:text-primary/80 flex items-center gap-1 uppercase tracking-wider">
+            <Link href={ROUTES.products} className="text-xs font-bold text-primary hover:text-primary/80 flex items-center gap-1 uppercase tracking-wider">
               Shop All Products <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
@@ -128,7 +129,7 @@ export default async function Home() {
               <p className="text-xs text-primary-foreground/80 mt-0.5">On all domestic orders over ₹5,000. Apply at checkout automatically.</p>
             </div>
           </div>
-          <Button href="/products" variant="secondary" size="sm" className="uppercase text-[10px] tracking-wider font-extrabold px-6 h-9 shrink-0">
+          <Button href={ROUTES.products} variant="secondary" size="sm" className="uppercase text-[10px] tracking-wider font-extrabold px-6 h-9 shrink-0">
             Shop New Arrivals
           </Button>
         </div>

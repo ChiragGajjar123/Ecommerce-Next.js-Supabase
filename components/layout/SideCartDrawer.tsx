@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { X, Trash2, ShoppingBag } from 'lucide-react';
 import { useCart } from '@/lib/hooks/useCart';
 import { formatPrice } from '@/lib/utils/formatPrice';
+import { ROUTES } from '@/lib/utils/routes';
 import { Button } from '@/components/ui/Button';
 
 interface SideCartDrawerProps {
@@ -170,10 +171,10 @@ export function SideCartDrawer({ isOpen, onClose }: SideCartDrawerProps) {
               <span className="text-lg font-bold text-foreground">{formatPrice(subtotal)}</span>
             </div>
             <div className="flex flex-col gap-3">
-              <Button href="/checkout" className="w-full" onClick={onClose}>
+              <Button href={ROUTES.checkout} className="w-full" onClick={onClose}>
                 Proceed to Checkout
               </Button>
-              <Button href="/cart" variant="outline" className="w-full" onClick={onClose}>
+              <Button href={ROUTES.cart} variant="outline" className="w-full" onClick={onClose}>
                 View Shopping Cart
               </Button>
             </div>

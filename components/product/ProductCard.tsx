@@ -69,7 +69,7 @@ export function ProductCard({ product, user }: ProductCardProps) {
           />
 
           {/* Badges */}
-          <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
+          <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-20">
             {hasDiscount && (
               <Badge variant="destructive" className="font-black text-[9px]">
                 -{discount}% OFF
@@ -86,7 +86,7 @@ export function ProductCard({ product, user }: ProductCardProps) {
           <button
             onClick={handleWishlistToggle}
             className={cn(
-              "absolute top-3 right-3 p-2 rounded-full border border-border/10 bg-card/75 backdrop-blur-sm shadow-md transition-all duration-300 z-10 cursor-pointer",
+              "absolute top-3 right-3 p-2 rounded-full border border-border/10 bg-card/75 backdrop-blur-sm shadow-md transition-all duration-300 z-20 cursor-pointer",
               favorited 
                 ? "text-destructive bg-destructive/10 border-destructive/20" 
                 : "text-muted-foreground hover:text-foreground"

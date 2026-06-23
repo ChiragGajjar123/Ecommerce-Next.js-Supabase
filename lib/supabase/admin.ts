@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import type { UserRole } from '@/types';
 
 /**
  * Service-role admin client — bypasses RLS entirely.
@@ -16,3 +17,22 @@ export const createAdminClient = () =>
       },
     }
   );
+
+export async function getUserRoleById(userId: string): Promise<UserRole | null> {
+  const adminClient = createAdminClient();
+  const { data, error } = await adminClient
+    .from('profiles')
+    .select('role')
+    .eq('id', userId)
+    .maybeSingle();
+
+  if (error || !data) {
+    return null;
+  }
+
+  return data.role as UserRole;
+}
+
+export async function isUserAdmin(userId: string): Promise<boolean> {
+  return (await getUserRoleById(userId)) === 'admin';
+}

@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import crypto from 'crypto';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { createAdminClient, isUserAdmin } from '@/lib/supabase/admin';
 import { loginSchema, registerSchema, forgotPasswordSchema, resetPasswordSchema } from '@/lib/validations/auth.schema';
 import { productSchema, collectionSchema, reviewSchema } from '@/lib/validations/product.schema';
 import { checkoutSchema } from '@/lib/validations/checkout.schema';
@@ -27,6 +27,11 @@ import {
 // 1. AUTH ACTIONS
 // ==========================================
 
+function normalizeInternalRedirect(value: FormDataEntryValue | null): string {
+  const redirectTo = typeof value === 'string' ? value.trim() : '';
+  return redirectTo.startsWith('/') && !redirectTo.startsWith('//') ? redirectTo : '/';
+}
+
 export async function loginAction(
   prevState: any,
   formData: FormData
@@ -34,6 +39,7 @@ export async function loginAction(
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
   const rememberMe = formData.get('rememberMe') === 'true';
+  const redirectTo = normalizeInternalRedirect(formData.get('redirectTo'));
 
   const validation = loginSchema.safeParse({ email, password, rememberMe });
   if (!validation.success) {
@@ -59,6 +65,14 @@ export async function loginAction(
 
   if (profileError || !profile) {
     return { data: null, error: 'Failed to fetch user profile.' };
+  }
+
+  if (redirectTo.startsWith('/admin') && !(await isUserAdmin(data.user.id))) {
+    await supabase.auth.signOut();
+    return {
+      data: null,
+      error: 'Admin access is restricted to authorized staff accounts.',
+    };
   }
 
   return { data: { user: data.user, profile: profile as Profile }, error: null };

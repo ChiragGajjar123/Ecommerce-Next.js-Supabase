@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { X, User, LogOut, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { ROUTES } from '@/lib/utils/routes';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -60,9 +61,9 @@ export function MobileMenu({ isOpen, onClose, user, profile, onLogout }: MobileM
 
         {/* Links */}
         <nav className="flex flex-col gap-6 text-sm font-bold uppercase tracking-wider">
-          <Link href="/" onClick={onClose} className="hover:text-primary transition-colors">Home</Link>
-          <Link href="/collections" onClick={onClose} className="hover:text-primary transition-colors">Collections</Link>
-          <Link href="/products" onClick={onClose} className="hover:text-primary transition-colors">Shop All</Link>
+          <Link href={ROUTES.home} onClick={onClose} className="hover:text-primary transition-colors">Home</Link>
+          <Link href={ROUTES.collections} onClick={onClose} className="hover:text-primary transition-colors">Collections</Link>
+          <Link href={ROUTES.products} onClick={onClose} className="hover:text-primary transition-colors">Shop All</Link>
         </nav>
 
         {/* Footer Actions */}
@@ -80,12 +81,12 @@ export function MobileMenu({ isOpen, onClose, user, profile, onLogout }: MobileM
               </div>
               
               {profile?.role === 'admin' && (
-                <Button href="/admin" variant="outline" className="w-full justify-start gap-2 h-10 text-xs" onClick={onClose}>
+                <Button href={ROUTES.admin} variant="outline" className="w-full justify-start gap-2 h-10 text-xs" onClick={onClose}>
                   <LayoutDashboard className="w-4 h-4" /> Admin Panel
                 </Button>
               )}
               
-              <Button href="/account" variant="outline" className="w-full justify-start gap-2 h-10 text-xs" onClick={onClose}>
+              <Button href={ROUTES.account} variant="outline" className="w-full justify-start gap-2 h-10 text-xs" onClick={onClose}>
                 <User className="w-4 h-4" /> My Account
               </Button>
               
@@ -95,10 +96,10 @@ export function MobileMenu({ isOpen, onClose, user, profile, onLogout }: MobileM
             </>
           ) : (
             <div className="flex flex-col gap-3">
-              <Button href="/auth/login" className="w-full" onClick={onClose}>
+              <Button href={ROUTES.auth.login} className="w-full" onClick={onClose}>
                 Log In
               </Button>
-              <Button href="/auth/register" variant="outline" className="w-full" onClick={onClose}>
+              <Button href={ROUTES.auth.register} variant="outline" className="w-full" onClick={onClose}>
                 Sign Up
               </Button>
             </div>

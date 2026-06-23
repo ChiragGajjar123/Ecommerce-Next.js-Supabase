@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { toast } from '@/components/ui/Toast';
 import { Lock } from 'lucide-react';
+import { ROUTES } from '@/lib/utils/routes';
 
 function ResetPasswordContent() {
   const router = useRouter();
@@ -70,7 +71,7 @@ function ResetPasswordContent() {
       toast.error(res.error);
     } else {
       toast.success('Your password has been reset successfully. Please log in.');
-      router.push('/auth/login');
+      router.replace(ROUTES.auth.login);
     }
   };
 

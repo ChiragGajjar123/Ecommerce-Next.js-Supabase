@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/Badge';
 import { ProductCard } from '@/components/product/ProductCard';
 import { Product, ProductVariant, Review } from '@/types';
 import { createReviewAction } from '@/lib/actions/actions';
+import { ROUTES } from '@/lib/utils/routes';
 
 interface ProductDetailClientProps {
   product: Product;
@@ -132,9 +133,9 @@ export function ProductDetailClient({
       
       {/* Breadcrumbs */}
       <nav className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2 select-none">
-        <Link href="/" className="hover:text-primary transition-colors">Home</Link>
+        <Link href={ROUTES.home} className="hover:text-primary transition-colors">Home</Link>
         <ChevronRight className="w-3.5 h-3.5" />
-        <Link href="/products" className="hover:text-primary transition-colors">Products</Link>
+        <Link href={ROUTES.products} className="hover:text-primary transition-colors">Products</Link>
         <ChevronRight className="w-3.5 h-3.5" />
         <span className="text-foreground truncate">{product.name}</span>
       </nav>
@@ -482,7 +483,7 @@ export function ProductDetailClient({
               <p className="text-xs text-muted-foreground leading-normal">
                 Please log in to submit a rating and write a review.
               </p>
-              <Button href="/auth/login" size="sm" variant="outline" className="mt-4 text-xs font-bold uppercase tracking-wider">
+              <Button href={ROUTES.auth.login} size="sm" variant="outline" className="mt-4 text-xs font-bold uppercase tracking-wider">
                 Login
               </Button>
             </div>

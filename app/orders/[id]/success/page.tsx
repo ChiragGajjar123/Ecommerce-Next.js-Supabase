@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { CheckCircle2, Package, Calendar, Home } from 'lucide-react';
 import { getOrderByIdAction } from '@/lib/actions/actions';
 import { formatPrice } from '@/lib/utils/formatPrice';
+import { ROUTES } from '@/lib/utils/routes';
 import { Button } from '@/components/ui/Button';
 
 interface OrderSuccessProps {
@@ -138,10 +139,10 @@ export default async function OrderSuccess({ params }: OrderSuccessProps) {
 
       {/* Action CTA */}
       <div className="flex justify-center gap-4">
-        <Button href="/" variant="outline" className="px-8 uppercase text-xs font-bold tracking-wider">
+        <Button href={ROUTES.home} variant="outline" className="px-8 uppercase text-xs font-bold tracking-wider">
           Back To Home
         </Button>
-        <Button href="/account" className="px-8 uppercase text-xs font-bold tracking-wider">
+        <Button href={ROUTES.account} className="px-8 uppercase text-xs font-bold tracking-wider">
           View Orders
         </Button>
       </div>

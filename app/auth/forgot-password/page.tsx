@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { toast } from '@/components/ui/Toast';
 import { KeyRound } from 'lucide-react';
+import { ROUTES } from '@/lib/utils/routes';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -75,7 +76,7 @@ export default function ForgotPassword() {
         {/* Footer Link */}
         <p className="text-xs text-muted-foreground text-center mt-8 font-medium">
           Remember your password?{' '}
-          <Link href="/auth/login" className="font-bold text-primary hover:text-primary/80 transition-colors uppercase">
+          <Link href={ROUTES.auth.login} className="font-bold text-primary hover:text-primary/80 transition-colors uppercase">
             Log In
           </Link>
         </p>

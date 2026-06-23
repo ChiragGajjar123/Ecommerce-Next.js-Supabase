@@ -12,6 +12,11 @@ import { checkoutSchema, CheckoutInput } from '@/lib/validations/checkout.schema
 import { createClient } from '@/lib/supabase/client';
 import { createRazorpayOrderAction, verifyAndCreateOrderAction } from '@/lib/actions/actions';
 import { formatPrice } from '@/lib/utils/formatPrice';
+import {
+  buildLoginRedirectPath,
+  buildOrderSuccessPath,
+  ROUTES,
+} from '@/lib/utils/routes';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { toast } from '@/components/ui/Toast';
@@ -35,7 +40,7 @@ export default function Checkout() {
         // Pre-populate form email
         setValue('email', session.user.email || '');
       } else {
-        router.push('/auth/login?redirect=/checkout');
+        router.replace(buildLoginRedirectPath(ROUTES.checkout));
       }
     };
     getSession();
@@ -119,8 +124,7 @@ export default function Checkout() {
               setLoading(false);
             } else {
               toast.success('Order placed successfully!');
-              // Redirect to success screen
-              router.push(`/orders/${verificationRes.data.id}/success`);
+              router.replace(buildOrderSuccessPath(verificationRes.data.id));
             }
           } catch (err: any) {
             toast.error(err.message || 'Verification failed.');
@@ -154,7 +158,7 @@ export default function Checkout() {
       <div className="flex-1 max-w-md mx-auto px-4 py-24 flex flex-col items-center justify-center text-center gap-4">
         <ShoppingBag className="w-12 h-12 text-muted-foreground opacity-50" />
         <p className="font-semibold text-foreground">Your cart is empty. Add items to checkout.</p>
-        <Button onClick={() => router.push('/')} variant="outline" className="mt-2">
+        <Button onClick={() => router.push(ROUTES.home)} variant="outline" className="mt-2">
           Shop Products
         </Button>
       </div>
