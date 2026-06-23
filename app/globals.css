@@ -1,0 +1,160 @@
+@import "tailwindcss";
+
+:root {
+  --background: #fcfcf9; /* Luxury warm white */
+  --foreground: #1c1917; /* Slate charcoal */
+  --card: #ffffff;
+  --card-foreground: #1c1917;
+  --popover: #ffffff;
+  --popover-foreground: #1c1917;
+  --primary: #0f5132; /* Deep Emerald */
+  --primary-foreground: #f5f5f4;
+  --secondary: #c5a880; /* Mmuted gold/champagne */
+  --secondary-foreground: #1c1917;
+  --muted: #f5f5f4;
+  --muted-foreground: #78716c;
+  --accent: #d4af37; /* Bright gold */
+  --accent-foreground: #1c1917;
+  --destructive: #b91c1c;
+  --destructive-foreground: #f5f5f4;
+  --border: #e7e5e4;
+  --input: #e7e5e4;
+  --ring: #0f5132;
+  --radius: 0.75rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0f0f0e; /* Obsidian black */
+    --foreground: #f5f5f4;
+    --card: #151514;
+    --card-foreground: #f5f5f4;
+    --popover: #151514;
+    --popover-foreground: #f5f5f4;
+    --primary: #10b981; /* Luminous Emerald */
+    --primary-foreground: #0b0b0a;
+    --secondary: #d4af37; /* Gold */
+    --secondary-foreground: #0b0b0a;
+    --muted: #292524;
+    --muted-foreground: #a8a29e;
+    --accent: #c5a880;
+    --accent-foreground: #0b0b0a;
+    --destructive: #ef4444;
+    --destructive-foreground: #f5f5f4;
+    --border: #292524;
+    --input: #292524;
+    --ring: #10b981;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+  
+  --animate-fade-in: fade-in 0.3s ease-out;
+  --animate-slide-up: slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-slide-in-right: slide-in-right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slide-in-right {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  min-height: 100vh;
+  overflow-x: hidden;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* WCAG AAA focus styling */
+*:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
+}
+
+/* Hardware accelerated utility classes */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Glassmorphism panel */
+.glass-panel {
+  background: rgba(var(--card), 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+}
+
+/* Image zoom effect layout protection */
+.image-zoom-container {
+  overflow: hidden;
+  position: relative;
+}
+.image-zoom-img {
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.image-zoom-container:hover .image-zoom-img {
+  transform: scale(1.05);
+}
