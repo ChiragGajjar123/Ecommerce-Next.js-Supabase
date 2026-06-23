@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { toast } from '@/components/ui/Toast';
 import { Button } from '@/components/ui/Button';
+import { Logo } from './Logo';
 
 export function Footer() {
   const [email, setEmail] = useState('');
@@ -28,9 +29,7 @@ export function Footer() {
           
           {/* Brand Col */}
           <div className="flex flex-col gap-4">
-            <span className="font-black text-xl tracking-wider text-primary uppercase select-none">
-              CMG
-            </span>
+            <Logo className="h-8" />
             <p className="text-xs text-muted-foreground leading-relaxed">
               Crafting premium items and custom-tailored merchandise with luxury materials and minimalist design ethics.
             </p>

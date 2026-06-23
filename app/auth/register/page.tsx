@@ -7,6 +7,7 @@ import { registerAction } from '@/lib/actions/actions';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { toast } from '@/components/ui/Toast';
+import { Logo } from '@/components/layout/Logo';
 
 export default function Register() {
   const router = useRouter();
@@ -32,10 +33,8 @@ export default function Register() {
       <div className="w-full max-w-md bg-card border border-border p-8 rounded-xl shadow-sm">
         
         {/* Header */}
-        <div className="text-center mb-8">
-          <span className="font-black text-xl tracking-wider text-primary uppercase select-none">
-            CMG
-          </span>
+        <div className="text-center mb-8 flex flex-col items-center justify-center gap-2">
+          <Logo className="h-10" />
           <h2 className="text-xl font-bold tracking-tight text-foreground uppercase mt-4">Create Account</h2>
           <p className="text-xs text-muted-foreground mt-1">Join us to experience personalized shopping.</p>
         </div>

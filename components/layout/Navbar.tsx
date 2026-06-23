@@ -10,6 +10,7 @@ import { logoutAction } from '@/lib/actions/actions';
 import { SideCartDrawer } from './SideCartDrawer';
 import { MobileMenu } from './MobileMenu';
 import { Button } from '@/components/ui/Button';
+import { Logo } from './Logo';
 
 export function Navbar() {
   const router = useRouter();
@@ -95,8 +96,8 @@ export function Navbar() {
           </button>
 
           {/* Logo */}
-          <Link href="/" className="font-black text-xl tracking-wider text-primary uppercase select-none">
-            CMG
+          <Link href="/" className="flex items-center">
+            <Logo className="h-8" />
           </Link>
 
           {/* Desktop Navigation */}
