@@ -96,7 +96,7 @@ export function Navbar() {
 
           {/* Logo */}
           <Link href="/" className="font-black text-xl tracking-wider text-primary uppercase select-none">
-            Ecommerce
+            CMG
           </Link>
 
           {/* Desktop Navigation */}

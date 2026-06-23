@@ -69,9 +69,10 @@ export async function registerAction(
 ): Promise<ActionResult<{ user: any }>> {
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
+  const confirmPassword = formData.get('confirmPassword') as string;
   const fullName = formData.get('fullName') as string;
 
-  const validation = registerSchema.safeParse({ email, password, fullName });
+  const validation = registerSchema.safeParse({ email, password, confirmPassword, fullName });
   if (!validation.success) {
     return { data: null, error: validation.error.issues[0].message };
   }

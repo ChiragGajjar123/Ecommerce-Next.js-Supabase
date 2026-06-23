@@ -29,7 +29,7 @@ export function Footer() {
           {/* Brand Col */}
           <div className="flex flex-col gap-4">
             <span className="font-black text-xl tracking-wider text-primary uppercase select-none">
-              Ecommerce
+              CMG
             </span>
             <p className="text-xs text-muted-foreground leading-relaxed">
               Crafting premium items and custom-tailored merchandise with luxury materials and minimalist design ethics.
@@ -81,7 +81,7 @@ export function Footer() {
 
         <div className="border-t border-border/60 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase">
-            &copy; {new Date().getFullYear()} ECOMMERCE INC. ALL RIGHTS RESERVED.
+            &copy; {new Date().getFullYear()} CMG INC. ALL RIGHTS RESERVED.
           </p>
           <div className="flex gap-6 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
             <Link href="#" className="hover:text-primary transition-colors">Privacy Policy</Link>

@@ -49,7 +49,7 @@ function LoginContent() {
         {/* Header */}
         <div className="text-center mb-8">
           <span className="font-black text-xl tracking-wider text-primary uppercase select-none">
-            Ecommerce
+            CMG
           </span>
           <h2 className="text-xl font-bold tracking-tight text-foreground uppercase mt-4">Welcome Back</h2>
           <p className="text-xs text-muted-foreground mt-1">Please enter your credentials to login.</p>
@@ -157,7 +157,7 @@ export default function Login() {
       <div className="flex-1 flex items-center justify-center py-16 px-4">
         <div className="w-full max-w-md bg-card border border-border p-8 rounded-xl shadow-sm text-center">
           <span className="font-black text-xl tracking-wider text-primary uppercase select-none block mb-4">
-            Ecommerce
+            CMG
           </span>
           <p className="text-xs text-muted-foreground">Loading login form...</p>
         </div>

@@ -85,7 +85,7 @@ export default function Checkout() {
         key: keyId,
         amount,
         currency: 'INR',
-        name: 'ECOMMERCE INC.',
+        name: 'CMG INC.',
         description: 'Premium Apparel Purchase',
         order_id: orderId,
         handler: async function (response: any) {

@@ -12,7 +12,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Luxury E-Commerce | Curated Minimalist Apparel',
+  title: 'CMG | Luxury Curated Apparel',
   description: 'Shop our premium, minimalist collections crafted with sustainable, high-end materials. Experience state-of-the-art checkout and rapid shipping.',
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
 };

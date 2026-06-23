@@ -34,7 +34,7 @@ export default function Register() {
         {/* Header */}
         <div className="text-center mb-8">
           <span className="font-black text-xl tracking-wider text-primary uppercase select-none">
-            Ecommerce
+            CMG
           </span>
           <h2 className="text-xl font-bold tracking-tight text-foreground uppercase mt-4">Create Account</h2>
           <p className="text-xs text-muted-foreground mt-1">Join us to experience personalized shopping.</p>
@@ -75,6 +75,20 @@ export default function Register() {
             <p className="text-[10px] text-muted-foreground leading-normal mt-1">
               Must contain at least 8 characters, 1 uppercase letter, 1 number, and 1 special symbol.
             </p>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground select-none">
+              Verify Password
+            </label>
+            <input
+              type="password"
+              name="confirmPassword"
+              placeholder="••••••••"
+              required
+              autoComplete="new-password"
+              className="flex h-11 w-full rounded-lg border border-input bg-card px-3.5 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 transition-all"
+            />
           </div>
 
           <Button type="submit" className="w-full uppercase text-xs font-bold tracking-wider" isLoading={isPending}>
