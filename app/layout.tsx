@@ -4,6 +4,7 @@ import './globals.css';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { ToastProvider } from '@/components/ui/Toast';
+import { Providers } from '@/components/layout/Providers';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -25,12 +26,14 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} font-sans h-full`}>
       <body className="min-h-full flex flex-col bg-background text-foreground transition-colors duration-300">
-        <Navbar />
-        <main className="flex-1 flex flex-col relative w-full">
-          {children}
-        </main>
-        <Footer />
-        <ToastProvider />
+        <Providers>
+          <Navbar />
+          <main className="flex-1 flex flex-col relative w-full">
+            {children}
+          </main>
+          <Footer />
+          <ToastProvider />
+        </Providers>
       </body>
     </html>
   );
