@@ -113,15 +113,35 @@ export async function forgotPasswordAction(
   }
 
   const supabase = createClient();
-  
-  // Mitigation against enumeration attacks: return generic success always
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+
+  // Step 1: Verify the email exists in the profiles table
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('email', email)
+    .maybeSingle();
+
+  if (profileError) {
+    console.error('Profile lookup error:', profileError);
+    return { data: null, error: 'Something went wrong. Please try again.' };
+  }
+
+  if (!profile) {
+    // Email is not registered — return a clear, user-friendly error
+    return {
+      data: null,
+      error: 'No account found with this email address. Please check and try again.',
+    };
+  }
+
+  // Step 2: Email exists — send the password reset link
+  const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/reset-password`,
   });
 
-  if (error) {
-    // We log but still return success to prevent user enumeration
-    console.error('Forgot password error:', error);
+  if (resetError) {
+    console.error('Forgot password error:', resetError);
+    return { data: null, error: resetError.message };
   }
 
   return { data: true, error: null };

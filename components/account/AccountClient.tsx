@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Package, Heart, LogOut, User, LayoutDashboard, ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -18,13 +19,14 @@ interface AccountClientProps {
 }
 
 export function AccountClient({ profile, orders, wishlist, user }: AccountClientProps) {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<'orders' | 'wishlist'>('orders');
   const [loggingOut, setLoggingOut] = useState(false);
 
   const handleLogout = async () => {
     setLoggingOut(true);
     await logoutAction();
-    window.location.href = '/';
+    router.push('/');
   };
 
   return (
