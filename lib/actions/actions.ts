@@ -40,57 +40,6 @@ export async function loginAction(
     return { data: null, error: validation.error.issues[0].message };
   }
 
-  const isEnvAdmin =
-    process.env.ADMIN_EMAIL &&
-    email.toLowerCase() === process.env.ADMIN_EMAIL.toLowerCase();
-
-  // Handle environment-configured admin
-  if (isEnvAdmin) {
-    if (process.env.ADMIN_PASSWORD && password !== process.env.ADMIN_PASSWORD) {
-      return { data: null, error: 'Invalid admin credentials.' };
-    }
-
-    const adminClient = createAdminClient();
-
-    // Check if the user already exists in auth
-    const { data: usersData } = await adminClient.auth.admin.listUsers();
-    const existingUser = usersData?.users.find(
-      (u) => u.email?.toLowerCase() === email.toLowerCase()
-    );
-
-    if (!existingUser) {
-      // Auto-create confirmed admin user in auth
-      const { data: newUserData, error: createError } = await adminClient.auth.admin.createUser({
-        email,
-        password,
-        email_confirm: true,
-        user_metadata: { full_name: 'Admin User' },
-      });
-
-      if (createError) {
-        return { data: null, error: `Failed to auto-create admin user: ${createError.message}` };
-      }
-
-      if (newUserData.user) {
-        // Upsert their profile with 'admin' role
-        await adminClient.from('profiles').upsert({
-          id: newUserData.user.id,
-          email,
-          full_name: 'Admin User',
-          role: 'admin',
-        });
-      }
-    } else {
-      // Ensure existing user's profile is updated to admin role
-      await adminClient.from('profiles').upsert({
-        id: existingUser.id,
-        email,
-        full_name: existingUser.user_metadata?.full_name || 'Admin User',
-        role: 'admin',
-      });
-    }
-  }
-
   const supabase = createClient();
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
@@ -129,15 +78,6 @@ export async function registerAction(
     return { data: null, error: validation.error.issues[0].message };
   }
 
-  const isEnvAdmin =
-    process.env.ADMIN_EMAIL &&
-    email.toLowerCase() === process.env.ADMIN_EMAIL.toLowerCase();
-
-  // Enforce password match if registering the configured admin email
-  if (isEnvAdmin && process.env.ADMIN_PASSWORD && password !== process.env.ADMIN_PASSWORD) {
-    return { data: null, error: 'Password does not match the configured admin password.' };
-  }
-
   const supabase = createClient();
   const { data, error } = await supabase.auth.signUp({
     email,
@@ -157,8 +97,6 @@ export async function registerAction(
     return { data: null, error: 'Registration failed. Please try again.' };
   }
 
-  const role = isEnvAdmin ? 'admin' : 'customer';
-
   // Manually upsert the profile row as a safety fallback in case
   // the DB trigger (on_auth_user_created) hasn't executed yet.
   const adminClient = createAdminClient();
@@ -167,13 +105,14 @@ export async function registerAction(
       id: data.user.id,
       email,
       full_name: fullName,
-      role,
+      role: 'customer',
     },
     { onConflict: 'id', ignoreDuplicates: true }
   );
 
   return { data: { user: data.user, email }, error: null };
 }
+
 
 
 export async function logoutAction(): Promise<ActionResult<boolean>> {

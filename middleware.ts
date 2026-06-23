@@ -5,6 +5,15 @@ export async function middleware(request: NextRequest) {
   const { supabase, response, user } = await updateSession(request);
   const pathname = request.nextUrl.pathname;
 
+  // Redirect authenticated users away from auth pages (login, register, etc.)
+  if (pathname.startsWith('/auth/')) {
+    if (user) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/';
+      return NextResponse.redirect(url);
+    }
+  }
+
   // Protected customer/checkout routes
   if (pathname.startsWith('/account') || pathname.startsWith('/checkout')) {
     if (!user) {
