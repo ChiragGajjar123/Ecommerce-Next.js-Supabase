@@ -16,6 +16,7 @@ export default function AccountPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
   const [user, setUser] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const init = async () => {
@@ -36,7 +37,9 @@ export default function AccountPage() {
 
       if (profileRes.error || !profileRes.data) {
         console.error('Account page profile fetch error:', profileRes.error);
-        router.push('/');
+        // Stop spinner and show error — don't silently redirect
+        setError('Could not load your profile. Please try logging out and back in.');
+        setLoading(false);
         return;
       }
 
@@ -58,6 +61,22 @@ export default function AccountPage() {
           <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
             Loading your account…
           </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex-1 flex items-center justify-center min-h-[60vh]">
+        <div className="flex flex-col items-center gap-4 text-center px-4">
+          <p className="text-sm font-semibold text-destructive">{error}</p>
+          <button
+            onClick={() => router.push('/auth/login')}
+            className="text-xs font-bold uppercase tracking-wider text-primary hover:underline"
+          >
+            Go to Login
+          </button>
         </div>
       </div>
     );

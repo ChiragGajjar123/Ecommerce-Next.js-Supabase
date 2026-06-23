@@ -69,6 +69,9 @@ export function Navbar() {
 
   const handleLogout = async () => {
     await logoutAction();
+    // Also sign out client-side so onAuthStateChange fires
+    // and immediately clears user state in the Navbar
+    await supabase.auth.signOut();
     router.push('/');
   };
 

@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { Package, Heart, LogOut, User, LayoutDashboard, ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { logoutAction } from '@/lib/actions/actions';
+import { createClient } from '@/lib/supabase/client';
 import { formatPrice } from '@/lib/utils/formatPrice';
 import { Order, WishlistItem, Profile } from '@/types';
 import { ProductCard } from '@/components/product/ProductCard';
@@ -20,12 +21,15 @@ interface AccountClientProps {
 
 export function AccountClient({ profile, orders, wishlist, user }: AccountClientProps) {
   const router = useRouter();
+  const supabase = createClient();
   const [activeTab, setActiveTab] = useState<'orders' | 'wishlist'>('orders');
   const [loggingOut, setLoggingOut] = useState(false);
 
   const handleLogout = async () => {
     setLoggingOut(true);
     await logoutAction();
+    // Sign out client-side so onAuthStateChange fires and Navbar updates
+    await supabase.auth.signOut();
     router.push('/');
   };
 
