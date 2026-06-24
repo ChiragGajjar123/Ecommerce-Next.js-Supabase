@@ -53,11 +53,11 @@ export function Modal({ isOpen, onClose, title, children, className }: ModalProp
       <div
         ref={modalRef}
         className={cn(
-          "relative w-full max-w-lg rounded-xl border border-border bg-card p-6 shadow-xl animate-slide-up z-10 focus:outline-none max-h-[95vh] flex flex-col",
+          "relative w-full max-w-lg rounded-xl border border-border bg-card shadow-xl animate-slide-up z-10 focus:outline-none max-h-[95vh] flex flex-col overflow-hidden",
           className
         )}
       >
-        <div className="flex items-center justify-between border-b border-border pb-3 mb-4 shrink-0">
+        <div className="flex items-center justify-between border-b border-border px-6 py-6 shrink-0">
           {title ? (
             <h3 className="text-base font-bold tracking-tight text-foreground uppercase">{title}</h3>
           ) : (

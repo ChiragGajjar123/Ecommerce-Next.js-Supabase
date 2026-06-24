@@ -95,7 +95,7 @@ export function QuickViewModal({ product, isOpen, onClose, userId }: QuickViewMo
           </svg>
         </div>
       ) : (
-        <div className="flex-1 overflow-y-auto min-h-0 px-1 grid grid-cols-1 md:grid-cols-2 gap-8 py-2">
+        <div className="flex-1 overflow-y-auto min-h-0 px-6 py-6 grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Images Section */}
           <div className="flex flex-col gap-4">
             <div className="relative aspect-square w-full bg-muted rounded-xl overflow-hidden border border-border">

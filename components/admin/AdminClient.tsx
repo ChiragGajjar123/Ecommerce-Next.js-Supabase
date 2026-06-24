@@ -549,7 +549,7 @@ export function AdminClient({ initialStats, initialProducts, initialCollections 
         className="max-w-4xl max-h-[90vh]"
       >
         <form onSubmit={handleFormSubmit} className="flex-1 flex flex-col min-h-0">
-          <div className="flex-1 overflow-y-auto min-h-0 px-1 py-2 flex flex-col gap-6">
+          <div className="flex-1 overflow-y-auto min-h-0 px-6 py-6 flex flex-col gap-6">
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <Input label="Product Name" required value={formName} onChange={(e) => setFormName(e.target.value)} />
@@ -734,7 +734,7 @@ export function AdminClient({ initialStats, initialProducts, initialCollections 
           </div>
 
           {/* Form Actions CTA */}
-          <div className="border-t border-border pt-4 mt-4 flex justify-end gap-3 shrink-0">
+          <div className="border-t border-border px-6 py-6 flex justify-end gap-3 shrink-0">
             <Button type="button" variant="outline" onClick={() => setIsProductModalOpen(false)}>
               Cancel
             </Button>
@@ -748,11 +748,11 @@ export function AdminClient({ initialStats, initialProducts, initialCollections 
 
       {/* 5. DELETE VERIFICATION MODAL */}
       <Modal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} title="Confirm Deletion">
-        <div className="py-2 flex flex-col gap-4">
-          <p className="text-xs text-muted-foreground leading-normal">
-            Are you sure you want to delete this product? This action is permanent and will delete all variants associated with it.
+        <div className="p-6 space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Are you sure you want to delete this product? This action is permanent and cannot be undone.
           </p>
-          <div className="flex justify-end gap-3 border-t border-border pt-4">
+          <div className="flex justify-end gap-3 pt-2">
             <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)}>Cancel</Button>
             <Button variant="destructive" onClick={handleConfirmDelete} isLoading={loading}>Delete Product</Button>
           </div>
@@ -762,7 +762,7 @@ export function AdminClient({ initialStats, initialProducts, initialCollections 
       {/* 6. ORDER DETAIL VIEW MODAL */}
       <Modal isOpen={isOrderModalOpen} onClose={() => setIsOrderModalOpen(false)} title="Order Summary">
         {selectedOrder && (
-          <div className="flex-1 overflow-y-auto min-h-0 px-1 flex flex-col gap-5 py-2">
+          <div className="flex-1 overflow-y-auto min-h-0 px-6 py-6 flex flex-col gap-5">
             <div className="grid grid-cols-2 gap-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
               <div>
                 <p className="text-[10px]">Order ID</p>
