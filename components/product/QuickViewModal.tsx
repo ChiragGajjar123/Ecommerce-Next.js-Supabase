@@ -24,7 +24,9 @@ export function QuickViewModal({ product, isOpen, onClose, userId }: QuickViewMo
   const { addItem } = useCart();
   const [variants, setVariants] = useState<ProductVariant[]>([]);
   const [loadingVariants, setLoadingVariants] = useState(false);
-  const [activeImage, setActiveImage] = useState<string>('');
+  const [activeImage, setActiveImage] = useState<string>(
+    product?.images?.[0] || '/placeholder.png'
+  );
   const [quantity, setQuantity] = useState(1);
   const [adding, setAdding] = useState(false);
 
@@ -56,7 +58,7 @@ export function QuickViewModal({ product, isOpen, onClose, userId }: QuickViewMo
     }
   }, [variantHelper.selectedVariant]);
 
-  if (!product) return null;
+  if (!isOpen || !product) return null;
 
   const handleAddToCart = async () => {
     setAdding(true);
