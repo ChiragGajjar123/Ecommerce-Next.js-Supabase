@@ -27,7 +27,7 @@ VALUES
     'accessories',
     'Curated Accessories',
     'Finely crafted leather goods and accessories designed for modern utility.',
-    'https://images.unsplash.com/photo-1627124765135-56a290d29676?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80',
     false,
     3
 )
@@ -101,7 +101,7 @@ VALUES
     'Handcrafted from high-end full-grain veg-tanned leather, this backpack offers a dedicated padded 16-inch laptop compartment, solid brass hardware, and heavy-duty adjustable shoulder straps. Gets a beautiful, rich natural patina over time.',
     7999.00,
     9999.00,
-    ARRAY['"https://images.unsplash.com/photo-1627124765135-56a290d29676?auto=format&fit=crop&w=800&q=80"']::jsonb[],
+    ARRAY['"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80"']::jsonb[],
     'active',
     'c3333333-3333-3333-3333-333333333333',
     'Full-Grain Classic Leather Backpack | Luxury Curated Apparel',
@@ -112,5 +112,5 @@ ON CONFLICT (id) DO NOTHING;
 -- Variants for Product 3
 INSERT INTO public.product_variants (id, product_id, name, options, price, stock, sku, image_url)
 VALUES
-('b3333331-3333-3333-3333-333333333333', 'a3333333-3333-3333-3333-333333333333', 'Tan / O.S.', '{"color": "Tan", "size": "O.S."}', 7999.00, 8, 'BPK-TAN-OS', 'https://images.unsplash.com/photo-1627124765135-56a290d29676?auto=format&fit=crop&w=800&q=80')
+('b3333331-3333-3333-3333-333333333333', 'a3333333-3333-3333-3333-333333333333', 'Tan / O.S.', '{"color": "Tan", "size": "O.S."}', 7999.00, 8, 'BPK-TAN-OS', 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80')
 ON CONFLICT (id) DO NOTHING;
