@@ -731,7 +731,7 @@ export function AdminClient({ initialStats, initialProducts, initialCollections 
           )}
 
           {/* Form Actions CTA */}
-          <div className="border-t border-border pt-6 flex justify-end gap-3 shrink-0">
+          <div className="sticky bottom-0 bg-card border-t border-border py-4 mt-6 flex justify-end gap-3 shrink-0 z-10 -mx-1 px-1">
             <Button type="button" variant="outline" onClick={() => setIsProductModalOpen(false)}>
               Cancel
             </Button>
