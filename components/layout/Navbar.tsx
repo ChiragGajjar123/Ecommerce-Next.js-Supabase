@@ -90,19 +90,22 @@ export function Navbar() {
       <header className="sticky top-0 z-40 w-full border-b border-border bg-card/85 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           
-          {/* Mobile Menu Icon */}
-          <button
-            onClick={() => setIsMenuOpen(true)}
-            className="md:hidden p-2 rounded-lg text-muted-foreground hover:bg-muted cursor-pointer"
-            aria-label="Open menu"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
+          {/* Left Section: Mobile Menu & Logo */}
+          <div className="flex items-center gap-2">
+            {/* Mobile Menu Icon */}
+            <button
+              onClick={() => setIsMenuOpen(true)}
+              className="md:hidden p-2 -ml-2 rounded-lg text-muted-foreground hover:bg-muted cursor-pointer"
+              aria-label="Open menu"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
 
-          {/* Logo */}
-          <Link href={ROUTES.home} className="flex items-center">
-            <Logo className="h-8" />
-          </Link>
+            {/* Logo */}
+            <Link href={ROUTES.home} className="flex items-center">
+              <Logo className="h-8" />
+            </Link>
+          </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8 text-xs font-bold uppercase tracking-wider">
