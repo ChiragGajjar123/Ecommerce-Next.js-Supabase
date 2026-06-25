@@ -109,119 +109,121 @@ export function AddressForm({ userId, initialAddress, onSuccess, onCancel }: Add
     }
   };
 
+  const onError = (formErrors: any) => {
+    if (formErrors.latitude || formErrors.longitude) {
+      toast.error('Please pinpoint your address on the map before saving.');
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="p-6 flex flex-col gap-6 overflow-y-auto flex-1">
-      <div className="flex justify-between items-center select-none">
-        <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-          {isEdit ? 'Modify Address' : 'New Delivery Address'}
-        </h4>
-        
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={() => setShowMap(!showMap)}
-          className="text-xs font-bold uppercase tracking-wider gap-1.5"
-        >
-          <MapPin className="w-3.5 h-3.5 text-primary" />
-          {showMap ? 'Hide Map Picker' : 'Pinpoint on Map'}
-        </Button>
-      </div>
-
-      {/* Map Validation Error */}
-      {(errors.latitude || errors.longitude) && (
-        <div className="bg-destructive/10 border border-destructive/20 text-destructive rounded-lg px-4 py-2.5 text-xs font-semibold select-none flex items-center gap-1.5 animate-fade-in">
-          ⚠️ {errors.latitude?.message || errors.longitude?.message || 'Please pinpoint your address on the map.'}
+    <form onSubmit={handleSubmit(onSubmit, onError)} className="flex flex-col h-full max-h-[90vh] overflow-hidden flex-1">
+      {/* Scrollable Form Body */}
+      <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
+        <div className="flex justify-between items-center select-none shrink-0 pb-1">
+          <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            {isEdit ? 'Modify Address' : 'New Delivery Address'}
+          </h4>
         </div>
-      )}
 
-      {/* Map Picker Wrapper */}
-      {showMap && (
-        <div className="animate-fade-in">
-          <MapPicker
-            onLocationSelect={onLocationSelect}
-            initialLat={watchLat || undefined}
-            initialLng={watchLng || undefined}
+        {/* Address Form Inputs */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Input
+            label="Full Name"
+            placeholder="Recipient Name"
+            error={errors.fullName?.message}
+            {...register('fullName')}
+          />
+          <Input
+            label="Phone Number"
+            placeholder="e.g. +91 9876543210"
+            error={errors.phone?.message}
+            {...register('phone')}
           />
         </div>
-      )}
 
-      {/* Address Form Inputs */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Input
-          label="Full Name"
-          placeholder="Recipient Name"
-          error={errors.fullName?.message}
-          {...register('fullName')}
-        />
-        <Input
-          label="Phone Number"
-          placeholder="e.g. +91 9876543210"
-          error={errors.phone?.message}
-          {...register('phone')}
-        />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Input
+            label="Address Line 1"
+            placeholder="House/Flat No., Building, Street"
+            error={errors.addressLine1?.message}
+            {...register('addressLine1')}
+          />
+          <Input
+            label="Address Line 2 (Optional)"
+            placeholder="Locality, Land Mark"
+            error={errors.addressLine2?.message}
+            {...register('addressLine2')}
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <Input
+            label="City"
+            placeholder="e.g. Bangalore"
+            error={errors.city?.message}
+            {...register('city')}
+          />
+          <Input
+            label="State"
+            placeholder="e.g. Karnataka"
+            error={errors.state?.message}
+            {...register('state')}
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <Input
+            label="Pincode"
+            placeholder="e.g. 560001"
+            error={errors.postalCode?.message}
+            {...register('postalCode')}
+          />
+          <Input
+            label="Country"
+            placeholder="e.g. India"
+            error={errors.country?.message}
+            {...register('country')}
+          />
+        </div>
+
+        {/* Default Address Checkbox */}
+        <div className="flex items-center gap-2 select-none py-1">
+          <input
+            type="checkbox"
+            id="isDefault"
+            className="w-4.5 h-4.5 accent-primary rounded border-border"
+            {...register('isDefault')}
+          />
+          <label htmlFor="isDefault" className="text-xs font-bold uppercase tracking-wider text-muted-foreground cursor-pointer">
+            Set as my default shipping address
+          </label>
+        </div>
+
+        {/* Map Pinpoint Section (Required at the end of the form) */}
+        <div className="flex flex-col gap-3 border-t border-border pt-6 mt-2">
+          <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 select-none">
+            <MapPin className="w-3.5 h-3.5 text-primary" /> Pinpoint Delivery Location (Required)
+          </label>
+
+          {/* Map Validation Error */}
+          {(errors.latitude || errors.longitude) && (
+            <div className="bg-destructive/10 border border-destructive/20 text-destructive rounded-lg px-4 py-2.5 text-xs font-semibold select-none flex items-center gap-1.5 animate-fade-in">
+              ⚠️ {errors.latitude?.message || errors.longitude?.message || 'Please pinpoint your address on the map.'}
+            </div>
+          )}
+
+          <div className="animate-fade-in">
+            <MapPicker
+              onLocationSelect={onLocationSelect}
+              initialLat={watchLat || undefined}
+              initialLng={watchLng || undefined}
+            />
+          </div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Input
-          label="Address Line 1"
-          placeholder="House/Flat No., Building, Street"
-          error={errors.addressLine1?.message}
-          {...register('addressLine1')}
-        />
-        <Input
-          label="Address Line 2 (Optional)"
-          placeholder="Locality, Land Mark"
-          error={errors.addressLine2?.message}
-          {...register('addressLine2')}
-        />
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <Input
-          label="City"
-          placeholder="e.g. Bangalore"
-          error={errors.city?.message}
-          {...register('city')}
-        />
-        <Input
-          label="State"
-          placeholder="e.g. Karnataka"
-          error={errors.state?.message}
-          {...register('state')}
-        />
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <Input
-          label="Pincode"
-          placeholder="e.g. 560001"
-          error={errors.postalCode?.message}
-          {...register('postalCode')}
-        />
-        <Input
-          label="Country"
-          placeholder="e.g. India"
-          error={errors.country?.message}
-          {...register('country')}
-        />
-      </div>
-
-      {/* Default Address Checkbox */}
-      <div className="flex items-center gap-2 select-none py-1">
-        <input
-          type="checkbox"
-          id="isDefault"
-          className="w-4.5 h-4.5 accent-primary rounded border-border"
-          {...register('isDefault')}
-        />
-        <label htmlFor="isDefault" className="text-xs font-bold uppercase tracking-wider text-muted-foreground cursor-pointer">
-          Set as my default shipping address
-        </label>
-      </div>
-
-      {/* Buttons */}
-      <div className="flex justify-end gap-3 border-t border-border pt-4 mt-2 shrink-0 select-none">
+      {/* Static Buttons Footer (Always visible at the bottom) */}
+      <div className="flex justify-end gap-3 border-t border-border p-6 bg-card shrink-0 select-none">
         <Button
           type="button"
           variant="outline"

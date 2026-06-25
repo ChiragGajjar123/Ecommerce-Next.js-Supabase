@@ -368,9 +368,10 @@ export function AccountClient({ profile, orders, wishlist, user, initialAddresse
                         <Button
                           variant="destructive"
                           size="sm"
-                          disabled={actionLoading !== null}
+                          disabled={actionLoading !== null || address.is_default}
                           onClick={() => handleDelete(address.id)}
-                          className="text-[10px] uppercase tracking-wider font-bold py-1 px-3 h-8 gap-1"
+                          title={address.is_default ? "Cannot delete default shipping address" : "Delete address"}
+                          className="text-[10px] uppercase tracking-wider font-bold py-1 px-3 h-8 gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                           <Trash2 className="w-3 h-3" /> Delete
                         </Button>

@@ -1275,6 +1275,16 @@ export async function createAddressAction(
 ): Promise<ActionResult<Address>> {
   try {
     const supabase = createClient();
+    
+    // Check if user has zero addresses currently
+    const { count } = await supabase
+      .from('addresses')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId);
+
+    const isFirstAddress = count === 0;
+    const finalIsDefault = isFirstAddress ? true : (addressData.is_default || false);
+
     const { data, error } = await supabase
       .from('addresses')
       .insert({
@@ -1287,7 +1297,7 @@ export async function createAddressAction(
         state: addressData.state,
         postal_code: addressData.postal_code,
         country: addressData.country,
-        is_default: addressData.is_default || false,
+        is_default: finalIsDefault,
         latitude: addressData.latitude || null,
         longitude: addressData.longitude || null,
       })
@@ -1311,6 +1321,16 @@ export async function updateAddressAction(
 ): Promise<ActionResult<Address>> {
   try {
     const supabase = createClient();
+
+    // Check count of addresses
+    const { count } = await supabase
+      .from('addresses')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId);
+
+    // If it is the only address, it must remain default
+    const finalIsDefault = (count === 1) ? true : addressData.is_default;
+
     const { data, error } = await supabase
       .from('addresses')
       .update({
@@ -1322,7 +1342,7 @@ export async function updateAddressAction(
         state: addressData.state,
         postal_code: addressData.postal_code,
         country: addressData.country,
-        is_default: addressData.is_default,
+        is_default: finalIsDefault,
         latitude: addressData.latitude,
         longitude: addressData.longitude,
         updated_at: new Date().toISOString(),
@@ -1348,6 +1368,23 @@ export async function deleteAddressAction(
 ): Promise<ActionResult<boolean>> {
   try {
     const supabase = createClient();
+
+    // Enforce that default address cannot be deleted
+    const { data: address, error: fetchError } = await supabase
+      .from('addresses')
+      .select('is_default')
+      .eq('id', addressId)
+      .eq('user_id', userId)
+      .single();
+
+    if (fetchError || !address) {
+      throw new Error('Address not found.');
+    }
+
+    if (address.is_default) {
+      throw new Error('You cannot delete your default address. Please set another address as default first.');
+    }
+
     const { error } = await supabase
       .from('addresses')
       .delete()
