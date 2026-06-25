@@ -56,7 +56,26 @@ CREATE TABLE public.profiles (
 -- Foreign key constraints linking profiles to auth.users
 ALTER TABLE public.profiles ADD CONSTRAINT fk_profiles_auth_users FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE;
 
--- 5. CART_ITEMS TABLE
+-- 5. ADDRESSES TABLE
+CREATE TABLE public.addresses (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    full_name text NOT NULL,
+    phone text NOT NULL,
+    address_line1 text NOT NULL,
+    address_line2 text,
+    city text NOT NULL,
+    state text NOT NULL,
+    postal_code text NOT NULL,
+    country text NOT NULL DEFAULT 'India',
+    is_default boolean NOT NULL DEFAULT false,
+    latitude numeric,
+    longitude numeric,
+    created_at timestamptz DEFAULT now(),
+    updated_at timestamptz DEFAULT now()
+);
+
+-- 6. CART_ITEMS TABLE
 CREATE TABLE public.cart_items (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id uuid REFERENCES public.profiles(id) ON DELETE CASCADE NULL,
@@ -67,7 +86,7 @@ CREATE TABLE public.cart_items (
     created_at timestamptz DEFAULT now()
 );
 
--- 6. ORDERS TABLE
+-- 7. ORDERS TABLE
 CREATE TABLE public.orders (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id uuid REFERENCES public.profiles(id) ON DELETE SET NULL NULL,
@@ -83,7 +102,7 @@ CREATE TABLE public.orders (
     created_at timestamptz DEFAULT now()
 );
 
--- 7. WISHLIST TABLE
+-- 8. WISHLIST TABLE
 CREATE TABLE public.wishlist (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
@@ -92,7 +111,7 @@ CREATE TABLE public.wishlist (
     UNIQUE(user_id, product_id)
 );
 
--- 8. REVIEWS TABLE
+-- 9. REVIEWS TABLE
 CREATE TABLE public.reviews (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     product_id uuid NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
@@ -107,6 +126,7 @@ ALTER TABLE public.collections ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.product_variants ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.addresses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.cart_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.wishlist ENABLE ROW LEVEL SECURITY;
@@ -123,7 +143,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- 9. ROW-LEVEL SECURITY POLICIES
+-- 10. ROW-LEVEL SECURITY POLICIES
 
 -- Collections Policies
 CREATE POLICY "Public read collections" ON public.collections FOR SELECT TO public USING (true);
@@ -141,6 +161,9 @@ CREATE POLICY "Admin CRUD variants" ON public.product_variants FOR ALL TO authen
 CREATE POLICY "Users read own profile" ON public.profiles FOR SELECT TO authenticated USING (id = auth.uid() OR public.is_admin());
 CREATE POLICY "Users update own profile" ON public.profiles FOR UPDATE TO authenticated USING (id = auth.uid() OR public.is_admin());
 CREATE POLICY "Admin CRUD profiles" ON public.profiles FOR ALL TO authenticated USING (public.is_admin());
+
+-- Addresses Policies
+CREATE POLICY "Users access own addresses" ON public.addresses FOR ALL TO authenticated USING (user_id = auth.uid() OR public.is_admin());
 
 -- Cart Items Policies
 CREATE POLICY "Users access own cart items" ON public.cart_items FOR ALL TO authenticated USING (user_id = auth.uid() OR public.is_admin());
@@ -160,7 +183,7 @@ CREATE POLICY "Public read reviews" ON public.reviews FOR SELECT TO public USING
 CREATE POLICY "Users write own reviews" ON public.reviews FOR INSERT TO authenticated WITH CHECK (user_id = auth.uid());
 CREATE POLICY "Admin CRUD reviews" ON public.reviews FOR ALL TO authenticated USING (public.is_admin());
 
--- 10. AUTH TRIGGER TO CREATE PROFILE AUTOMATICALLY
+-- 11. AUTH TRIGGER TO CREATE PROFILE AUTOMATICALLY
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
 BEGIN
@@ -176,6 +199,65 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
-CREATE TRIGGER on_auth_user_created
+CREATE OR REPLACE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- 12. PROTECT ADMIN ROLE ASSIGNMENT TRIGGER
+CREATE OR REPLACE FUNCTION public.check_admin_role_assignment()
+RETURNS trigger AS $$
+BEGIN
+  IF NEW.role = 'admin' AND (OLD IS NULL OR OLD.role IS DISTINCT FROM 'admin') THEN
+    IF current_user NOT IN ('postgres', 'supabase_admin') THEN
+      RAISE EXCEPTION 'Assigning the admin role is restricted to the Supabase SQL Editor.';
+    END IF;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER protect_admin_role
+  BEFORE INSERT OR UPDATE ON public.profiles
+  FOR EACH ROW
+  EXECUTE FUNCTION public.check_admin_role_assignment();
+
+-- 13. ADDRESS DEFAULT MULTI-SELECTION TRIGGER
+CREATE OR REPLACE FUNCTION public.handle_address_default()
+RETURNS trigger AS $$
+BEGIN
+  IF new.is_default = true THEN
+    UPDATE public.addresses
+    SET is_default = false
+    WHERE user_id = new.user_id AND id <> new.id;
+  END IF;
+  RETURN new;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE OR REPLACE TRIGGER on_address_default_selected
+  BEFORE INSERT OR UPDATE OF is_default ON public.addresses
+  FOR EACH ROW
+  WHEN (new.is_default = true)
+  EXECUTE FUNCTION public.handle_address_default();
+
+-- 14. PERMISSION GRANTS
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO authenticated, service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.collections TO authenticated, service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.products TO authenticated, service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.product_variants TO authenticated, service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.addresses TO authenticated, service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.cart_items TO authenticated, service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.orders TO authenticated, service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.wishlist TO authenticated, service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.reviews TO authenticated, service_role;
+
+GRANT SELECT ON public.profiles TO anon;
+GRANT SELECT ON public.collections TO anon;
+GRANT SELECT ON public.products TO anon;
+GRANT SELECT ON public.product_variants TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.cart_items TO anon;
+GRANT SELECT, INSERT ON public.orders TO anon;
+GRANT SELECT ON public.reviews TO anon;
+
+-- Grant usage on sequences so IDs can be generated/incremented
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO authenticated, anon;

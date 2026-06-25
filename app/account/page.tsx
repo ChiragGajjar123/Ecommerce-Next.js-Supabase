@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { getOrdersAction, getWishlistAction } from '@/lib/actions/actions';
+import { getOrdersAction, getWishlistAction, getAddressesAction } from '@/lib/actions/actions';
 import { AccountClient } from '@/components/account/AccountClient';
-import { Profile, Order, WishlistItem } from '@/types';
+import { Profile, Order, WishlistItem, Address } from '@/types';
 import { buildLoginRedirectPath, ROUTES } from '@/lib/utils/routes';
 
 export default function AccountPage() {
@@ -16,6 +16,7 @@ export default function AccountPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
+  const [addresses, setAddresses] = useState<Address[]>([]);
   const [user, setUser] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,11 +30,12 @@ export default function AccountPage() {
       }
       setUser(currentUser);
 
-      // 2. Fetch profile, orders, and wishlist in parallel
-      const [profileRes, ordersRes, wishlistRes] = await Promise.all([
+      // 2. Fetch profile, orders, wishlist, and addresses in parallel
+      const [profileRes, ordersRes, wishlistRes, addressesRes] = await Promise.all([
         supabase.from('profiles').select('*').eq('id', currentUser.id).single(),
         getOrdersAction(currentUser.id),
         getWishlistAction(currentUser.id),
+        getAddressesAction(currentUser.id),
       ]);
 
       if (profileRes.error || !profileRes.data) {
@@ -47,6 +49,7 @@ export default function AccountPage() {
       setProfile(profileRes.data as Profile);
       setOrders(ordersRes.data || []);
       setWishlist(wishlistRes.data || []);
+      setAddresses(addressesRes.data || []);
       setLoading(false);
     };
 
@@ -91,6 +94,7 @@ export default function AccountPage() {
       orders={orders}
       wishlist={wishlist}
       user={user}
+      initialAddresses={addresses}
     />
   );
 }

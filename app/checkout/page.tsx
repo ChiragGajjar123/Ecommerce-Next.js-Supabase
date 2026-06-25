@@ -6,11 +6,11 @@ import Image from 'next/image';
 import Script from 'next/script';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CreditCard, ShieldAlert, ShoppingBag, Truck } from 'lucide-react';
+import { CreditCard, ShieldAlert, ShoppingBag, Truck, MapPin, Check } from 'lucide-react';
 import { useCart } from '@/lib/hooks/useCart';
 import { checkoutSchema, CheckoutInput } from '@/lib/validations/checkout.schema';
 import { createClient } from '@/lib/supabase/client';
-import { createRazorpayOrderAction, verifyAndCreateOrderAction } from '@/lib/actions/actions';
+import { createRazorpayOrderAction, verifyAndCreateOrderAction, getAddressesAction } from '@/lib/actions/actions';
 import { formatPrice } from '@/lib/utils/formatPrice';
 import {
   buildLoginRedirectPath,
@@ -20,6 +20,7 @@ import {
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { toast } from '@/components/ui/Toast';
+import { Address } from '@/types';
 
 export default function Checkout() {
   const router = useRouter();
@@ -28,23 +29,10 @@ export default function Checkout() {
   const [loading, setLoading] = useState(false);
   const [shippingMethod, setShippingMethod] = useState<'standard' | 'express'>('standard');
 
-  const supabase = createClient();
+  const [savedAddresses, setSavedAddresses] = useState<Address[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<string>('custom');
 
-  useEffect(() => {
-    const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        setUser(session.user);
-        fetchCart(session.user.id);
-        
-        // Pre-populate form email
-        setValue('email', session.user.email || '');
-      } else {
-        router.replace(buildLoginRedirectPath(ROUTES.checkout));
-      }
-    };
-    getSession();
-  }, [supabase, router, fetchCart]);
+  const supabase = createClient();
 
   const {
     register,
@@ -57,6 +45,69 @@ export default function Checkout() {
       shippingMethod: 'standard' as const,
     },
   });
+
+  useEffect(() => {
+    const getSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        setUser(session.user);
+        fetchCart(session.user.id);
+        
+        // Pre-populate form email
+        setValue('email', session.user.email || '');
+
+        // Fetch user's saved addresses
+        const addrRes = await getAddressesAction(session.user.id);
+        if (addrRes.data && addrRes.data.length > 0) {
+          setSavedAddresses(addrRes.data);
+          
+          // Pre-populate default address if one exists
+          const defaultAddr = addrRes.data.find(a => a.is_default);
+          if (defaultAddr) {
+            setSelectedAddressId(defaultAddr.id);
+            setValue('fullName', defaultAddr.full_name);
+            setValue('phone', defaultAddr.phone);
+            setValue('addressLine1', defaultAddr.address_line1);
+            setValue('addressLine2', defaultAddr.address_line2 || '');
+            setValue('city', defaultAddr.city);
+            setValue('state', defaultAddr.state);
+            setValue('postalCode', defaultAddr.postal_code);
+            setValue('country', defaultAddr.country);
+          }
+        }
+      } else {
+        router.replace(buildLoginRedirectPath(ROUTES.checkout));
+      }
+    };
+    getSession();
+  }, [supabase, router, fetchCart, setValue]);
+
+  const handleAddressSelect = (addressId: string) => {
+    setSelectedAddressId(addressId);
+    if (addressId === 'custom') {
+      // Clear fields to let user enter manually
+      setValue('fullName', '');
+      setValue('phone', '');
+      setValue('addressLine1', '');
+      setValue('addressLine2', '');
+      setValue('city', '');
+      setValue('state', '');
+      setValue('postalCode', '');
+      setValue('country', 'India');
+    } else {
+      const selected = savedAddresses.find(a => a.id === addressId);
+      if (selected) {
+        setValue('fullName', selected.full_name);
+        setValue('phone', selected.phone);
+        setValue('addressLine1', selected.address_line1);
+        setValue('addressLine2', selected.address_line2 || '');
+        setValue('city', selected.city);
+        setValue('state', selected.state);
+        setValue('postalCode', selected.postal_code);
+        setValue('country', selected.country);
+      }
+    }
+  };
 
   const subtotal = items.reduce((acc, item) => {
     const price = item.variant?.price !== null && item.variant?.price !== undefined
@@ -185,6 +236,68 @@ export default function Checkout() {
             <h3 className="text-xs font-bold uppercase tracking-wider text-foreground border-b border-border pb-3">
               Delivery Information
             </h3>
+
+            {savedAddresses.length > 0 && (
+              <div className="flex flex-col gap-3 bg-muted/40 border border-border p-4 rounded-xl animate-fade-in select-none">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-primary" /> Ship to saved address
+                </label>
+                
+                <div className="grid grid-cols-1 gap-2.5 max-h-[180px] overflow-y-auto pr-1">
+                  {savedAddresses.map((addr) => (
+                    <button
+                      key={addr.id}
+                      type="button"
+                      onClick={() => handleAddressSelect(addr.id)}
+                      className={`w-full p-3 rounded-lg border text-left flex justify-between items-center transition-all cursor-pointer ${
+                        selectedAddressId === addr.id
+                          ? 'border-primary bg-primary/5 shadow-xs'
+                          : 'border-border bg-card hover:border-muted-foreground'
+                      }`}
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-bold text-foreground uppercase truncate flex items-center gap-1.5">
+                          {addr.full_name} 
+                          {addr.is_default && (
+                            <span className="text-[8px] bg-primary/10 text-primary border border-primary/20 px-1.5 py-0.5 rounded uppercase tracking-wider font-semibold">
+                              Default
+                            </span>
+                          )}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground truncate mt-0.5">
+                          {addr.address_line1}, {addr.city}, {addr.state}
+                        </p>
+                      </div>
+                      {selectedAddressId === addr.id && (
+                        <Check className="w-4 h-4 text-primary shrink-0 ml-2" />
+                      )}
+                    </button>
+                  ))}
+
+                  <button
+                    type="button"
+                    onClick={() => handleAddressSelect('custom')}
+                    className={`w-full p-3 rounded-lg border text-left flex justify-between items-center transition-all cursor-pointer ${
+                      selectedAddressId === 'custom'
+                        ? 'border-primary bg-primary/5 shadow-xs'
+                        : 'border-border bg-card hover:border-muted-foreground'
+                    }`}
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-bold text-foreground uppercase">
+                        Custom Address
+                      </p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5">
+                        Manually type a different delivery address
+                      </p>
+                    </div>
+                    {selectedAddressId === 'custom' && (
+                      <Check className="w-4 h-4 text-primary shrink-0 ml-2" />
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <Input

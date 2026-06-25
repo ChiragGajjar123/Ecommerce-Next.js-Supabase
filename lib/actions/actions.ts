@@ -7,6 +7,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { loginSchema, registerSchema, forgotPasswordSchema, resetPasswordSchema } from '@/lib/validations/auth.schema';
 import { productSchema, collectionSchema, reviewSchema } from '@/lib/validations/product.schema';
 import { checkoutSchema } from '@/lib/validations/checkout.schema';
+import { addressSchema } from '@/lib/validations/address.schema';
 import { 
   ActionResult, 
   Profile, 
@@ -20,7 +21,8 @@ import {
   OrderStatus,
   ProductStatus,
   OrderItem,
-  ShippingAddress
+  ShippingAddress,
+  Address
 } from '@/types';
 
 // ==========================================
@@ -1243,3 +1245,150 @@ export async function getDashboardStatsAction(): Promise<ActionResult<DashboardS
     return { data: null, error: error.message };
   }
 }
+
+// ==========================================
+// 8. ADDRESS ACTIONS
+// ==========================================
+
+export async function getAddressesAction(
+  userId: string
+): Promise<ActionResult<Address[]>> {
+  try {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('addresses')
+      .select('*')
+      .eq('user_id', userId)
+      .order('is_default', { ascending: false })
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return { data: data as Address[], error: null };
+  } catch (error: any) {
+    return { data: null, error: error.message };
+  }
+}
+
+export async function createAddressAction(
+  addressData: Omit<Address, 'id' | 'user_id' | 'created_at' | 'updated_at'>,
+  userId: string
+): Promise<ActionResult<Address>> {
+  try {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('addresses')
+      .insert({
+        user_id: userId,
+        full_name: addressData.full_name,
+        phone: addressData.phone,
+        address_line1: addressData.address_line1,
+        address_line2: addressData.address_line2 || null,
+        city: addressData.city,
+        state: addressData.state,
+        postal_code: addressData.postal_code,
+        country: addressData.country,
+        is_default: addressData.is_default || false,
+        latitude: addressData.latitude || null,
+        longitude: addressData.longitude || null,
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    revalidatePath('/account');
+    revalidatePath('/checkout');
+    return { data: data as Address, error: null };
+  } catch (error: any) {
+    return { data: null, error: error.message };
+  }
+}
+
+export async function updateAddressAction(
+  addressId: string,
+  addressData: Partial<Address>,
+  userId: string
+): Promise<ActionResult<Address>> {
+  try {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('addresses')
+      .update({
+        full_name: addressData.full_name,
+        phone: addressData.phone,
+        address_line1: addressData.address_line1,
+        address_line2: addressData.address_line2 || null,
+        city: addressData.city,
+        state: addressData.state,
+        postal_code: addressData.postal_code,
+        country: addressData.country,
+        is_default: addressData.is_default,
+        latitude: addressData.latitude,
+        longitude: addressData.longitude,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', addressId)
+      .eq('user_id', userId)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    revalidatePath('/account');
+    revalidatePath('/checkout');
+    return { data: data as Address, error: null };
+  } catch (error: any) {
+    return { data: null, error: error.message };
+  }
+}
+
+export async function deleteAddressAction(
+  addressId: string,
+  userId: string
+): Promise<ActionResult<boolean>> {
+  try {
+    const supabase = createClient();
+    const { error } = await supabase
+      .from('addresses')
+      .delete()
+      .eq('id', addressId)
+      .eq('user_id', userId);
+
+    if (error) throw error;
+
+    revalidatePath('/account');
+    revalidatePath('/checkout');
+    return { data: true, error: null };
+  } catch (error: any) {
+    return { data: null, error: error.message };
+  }
+}
+
+export async function setDefaultAddressAction(
+  addressId: string,
+  userId: string
+): Promise<ActionResult<Address>> {
+  try {
+    const supabase = createClient();
+    
+    // The postgres trigger BEFORE INSERT OR UPDATE OF is_default 
+    // will automatically flip all other addresses of this user to is_default = false.
+    // So we only need to update this address to is_default = true.
+    const { data, error } = await supabase
+      .from('addresses')
+      .update({ is_default: true, updated_at: new Date().toISOString() })
+      .eq('id', addressId)
+      .eq('user_id', userId)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    revalidatePath('/account');
+    revalidatePath('/checkout');
+    return { data: data as Address, error: null };
+  } catch (error: any) {
+    return { data: null, error: error.message };
+  }
+}
+
