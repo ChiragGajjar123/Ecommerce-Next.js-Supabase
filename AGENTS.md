@@ -245,3 +245,9 @@ ACCESSIBILITY & QUALITY ASSURANCE RULES
 - Accessibility (a11y): Ensure strict WCAG 2.1 AA compliance. Interactive element dimensions must match or exceed 44x44px touch grids. Include valid image alt tags, structural aria-labels on icon-only interactive controls, clear focus indicators, and native keyboard tab navigation support.
 - TypeScript Accuracy: Zero uses of `any`. Explicitly type every async function return structure. Map full Supabase structural definitions explicitly into the `/types/index.ts` file. 
 - Error Handling: Never swallow errors silently. Catch backend, database, and payment anomalies cleanly, surfacing them directly to users via clear, understandable UI notifications and error boundaries with localized retry mechanisms.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+COMMIT & PUSH WORKFLOW RULE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- You are allowed to stage and commit changes locally to git.
+- You must NEVER push code (`git push`) to the remote repository without explicit user permission or a direct request to do so.
