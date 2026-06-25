@@ -120,7 +120,7 @@ export function AccountClient({ profile, orders, wishlist, user, initialAddresse
   };
 
   return (
-    <div className="w-full py-16 md:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="w-full pt-8 pb-16 md:pt-12 md:pb-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       
       {/* Profile Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-b border-border pb-8 mb-12 select-none">
