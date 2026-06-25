@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import crypto from 'crypto';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient, isUserAdmin } from '@/lib/supabase/admin';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { loginSchema, registerSchema, forgotPasswordSchema, resetPasswordSchema } from '@/lib/validations/auth.schema';
 import { productSchema, collectionSchema, reviewSchema } from '@/lib/validations/product.schema';
 import { checkoutSchema } from '@/lib/validations/checkout.schema';
@@ -35,7 +35,7 @@ function normalizeInternalRedirect(value: FormDataEntryValue | null): string {
 export async function loginAction(
   prevState: any,
   formData: FormData
-): Promise<ActionResult<{ user: any; profile: Profile }>> {
+): Promise<ActionResult<{ user: any; session: any; profile: Profile }>> {
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
   const rememberMe = formData.get('rememberMe') === 'true';
@@ -67,15 +67,7 @@ export async function loginAction(
     return { data: null, error: 'Failed to fetch user profile.' };
   }
 
-  if (redirectTo.startsWith('/admin') && !(await isUserAdmin(data.user.id))) {
-    await supabase.auth.signOut();
-    return {
-      data: null,
-      error: 'Admin access is restricted to authorized staff accounts.',
-    };
-  }
-
-  return { data: { user: data.user, profile: profile as Profile }, error: null };
+  return { data: { user: data.user, session: data.session, profile: profile as Profile }, error: null };
 }
 
 export async function registerAction(

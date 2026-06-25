@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { X, User, LogOut, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { ROUTES } from '@/lib/utils/routes';
@@ -15,6 +16,7 @@ interface MobileMenuProps {
 }
 
 export function MobileMenu({ isOpen, onClose, user, profile, onLogout }: MobileMenuProps) {
+  const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -44,11 +46,11 @@ export function MobileMenu({ isOpen, onClose, user, profile, onLogout }: MobileM
 
       {/* Slide drawer */}
       <div 
-        className="relative w-4/5 max-w-sm h-full bg-card border-r border-border p-6 flex flex-col z-10 animate-fade-in focus:outline-none"
+        className="relative w-4/5 max-w-sm h-full bg-card border-r border-border flex flex-col z-10 animate-fade-in focus:outline-none overflow-y-auto"
         role="dialog"
         aria-modal="true"
       >
-        <div className="flex justify-between items-center mb-8">
+        <div className="sticky top-0 bg-card z-20 border-b border-border p-6 flex justify-between items-center">
           <span className="font-black text-lg tracking-widest text-primary uppercase">Menu</span>
           <button 
             onClick={onClose} 
@@ -60,14 +62,32 @@ export function MobileMenu({ isOpen, onClose, user, profile, onLogout }: MobileM
         </div>
 
         {/* Links */}
-        <nav className="flex flex-col gap-6 text-sm font-bold uppercase tracking-wider">
-          <Link href={ROUTES.home} onClick={onClose} className="hover:text-primary transition-colors">Home</Link>
-          <Link href={ROUTES.collections} onClick={onClose} className="hover:text-primary transition-colors">Collections</Link>
-          <Link href={ROUTES.products} onClick={onClose} className="hover:text-primary transition-colors">Shop All</Link>
+        <nav className="flex flex-col gap-6 text-sm font-bold uppercase tracking-wider p-6">
+          <Link 
+            href={ROUTES.home} 
+            onClick={onClose} 
+            className={`hover:text-primary transition-colors ${pathname === ROUTES.home ? 'text-primary' : 'text-foreground'}`}
+          >
+            Home
+          </Link>
+          <Link 
+            href={ROUTES.collections} 
+            onClick={onClose} 
+            className={`hover:text-primary transition-colors ${pathname.startsWith(ROUTES.collections) ? 'text-primary' : 'text-foreground'}`}
+          >
+            Collections
+          </Link>
+          <Link 
+            href={ROUTES.products} 
+            onClick={onClose} 
+            className={`hover:text-primary transition-colors ${pathname.startsWith(ROUTES.products) ? 'text-primary' : 'text-foreground'}`}
+          >
+            Shop All
+          </Link>
         </nav>
 
         {/* Footer Actions */}
-        <div className="mt-auto border-t border-border pt-6 flex flex-col gap-4">
+        <div className="mt-auto border-t border-border p-6 flex flex-col gap-4">
           {user ? (
             <>
               <div className="flex items-center gap-3 pb-2">

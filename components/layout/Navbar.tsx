@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { ShoppingBag, Search, User, Menu, LogOut, LayoutDashboard } from 'lucide-react';
 import { useCart } from '@/lib/hooks/useCart';
 import { createClient } from '@/lib/supabase/client';
@@ -15,11 +15,13 @@ import { buildProductsSearchPath, ROUTES } from '@/lib/utils/routes';
 
 export function Navbar() {
   const router = useRouter();
+  const pathname = usePathname();
   const { items, fetchCart, clearCart } = useCart();
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   
   const supabase = createClient();
@@ -95,7 +97,7 @@ export function Navbar() {
             {/* Mobile Menu Icon */}
             <button
               onClick={() => setIsMenuOpen(true)}
-              className="md:hidden p-2 -ml-2 rounded-lg text-muted-foreground hover:bg-muted cursor-pointer"
+              className="lg:hidden p-2 -ml-2 rounded-lg text-muted-foreground hover:bg-muted cursor-pointer"
               aria-label="Open menu"
             >
               <Menu className="w-6 h-6" />
@@ -108,14 +110,29 @@ export function Navbar() {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-8 text-xs font-bold uppercase tracking-wider">
-            <Link href={ROUTES.home} className="hover:text-primary transition-colors text-foreground">Home</Link>
-            <Link href={ROUTES.collections} className="hover:text-primary transition-colors text-foreground">Collections</Link>
-            <Link href={ROUTES.products} className="hover:text-primary transition-colors text-foreground">Shop All</Link>
+          <nav className="hidden lg:flex items-center gap-4 lg:gap-8 text-xs font-bold uppercase tracking-wider whitespace-nowrap">
+            <Link 
+              href={ROUTES.home} 
+              className={`whitespace-nowrap hover:text-primary transition-colors ${pathname === ROUTES.home ? 'text-primary' : 'text-foreground'}`}
+            >
+              Home
+            </Link>
+            <Link 
+              href={ROUTES.collections} 
+              className={`whitespace-nowrap hover:text-primary transition-colors ${pathname.startsWith(ROUTES.collections) ? 'text-primary' : 'text-foreground'}`}
+            >
+              Collections
+            </Link>
+            <Link 
+              href={ROUTES.products} 
+              className={`whitespace-nowrap hover:text-primary transition-colors ${pathname.startsWith(ROUTES.products) ? 'text-primary' : 'text-foreground'}`}
+            >
+              Shop All
+            </Link>
           </nav>
 
           {/* Search Bar */}
-          <form onSubmit={handleSearchSubmit} className="hidden sm:flex items-center relative max-w-xs w-full">
+          <form onSubmit={handleSearchSubmit} className="hidden lg:flex items-center relative max-w-xs w-full">
             <input
               type="text"
               placeholder="Search products..."
@@ -129,15 +146,19 @@ export function Navbar() {
           {/* Action Icons */}
           <div className="flex items-center gap-2">
             
-            {/* Search Toggle Mobile */}
-            <button className="sm:hidden p-2 rounded-lg text-muted-foreground hover:bg-muted cursor-pointer" aria-label="Search">
+            {/* Search Toggle Mobile/Tablet */}
+            <button 
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+              className="lg:hidden p-2 rounded-lg text-muted-foreground hover:bg-muted cursor-pointer" 
+              aria-label="Search"
+            >
               <Search className="w-5 h-5" />
             </button>
 
-            {/* Account Management Desktop */}
-            <div className="hidden md:block">
+            {/* Account Management Desktop (Full text on xl and above) */}
+            <div className="hidden xl:block">
               {user ? (
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
                   {profile?.role === 'admin' && (
                     <Button href={ROUTES.admin} variant="ghost" size="sm" className="h-9 px-3 gap-2">
                       <LayoutDashboard className="w-4 h-4 text-primary" /> Admin
@@ -157,14 +178,49 @@ export function Navbar() {
               )}
             </div>
 
-            {/* Account Icon Mobile */}
+            {/* Account Management Tablet (Icon only on lg to xl) */}
+            <div className="hidden lg:block xl:hidden">
+              {user ? (
+                <div className="flex items-center gap-1">
+                  {profile?.role === 'admin' && (
+                    <Button href={ROUTES.admin} variant="ghost" size="icon" className="h-9 w-9" title="Admin Dashboard">
+                      <LayoutDashboard className="w-4.5 h-4.5 text-primary" />
+                    </Button>
+                  )}
+                  <Button href={ROUTES.account} variant="ghost" size="icon" className="h-9 w-9" title="Account">
+                    <User className="w-4.5 h-4.5" />
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={handleLogout} className="h-9 w-9 text-destructive hover:bg-destructive/10" title="Log Out">
+                    <LogOut className="w-4.5 h-4.5" />
+                  </Button>
+                </div>
+              ) : (
+                <Button href={ROUTES.auth.login} variant="outline" size="icon" className="h-9 w-9" title="Login">
+                  <User className="w-4.5 h-4.5" />
+                </Button>
+              )}
+            </div>
+
+            {/* Account Icon Mobile/Tablet */}
             <Link 
               href={user ? ROUTES.account : ROUTES.auth.login} 
-              className="md:hidden p-2 rounded-lg text-muted-foreground hover:bg-muted"
+              className="lg:hidden p-2 rounded-lg text-muted-foreground hover:bg-muted"
               aria-label="Account"
             >
               <User className="w-5 h-5" />
             </Link>
+
+            {/* Log Out Icon Mobile/Tablet */}
+            {user && (
+              <button 
+                onClick={handleLogout}
+                className="lg:hidden p-2 rounded-lg text-destructive hover:bg-destructive/10 cursor-pointer animate-fade-in"
+                aria-label="Log Out"
+                title="Log Out"
+              >
+                <LogOut className="w-5 h-5" />
+              </button>
+            )}
 
             {/* Shopping Cart Trigger */}
             <button
@@ -182,6 +238,23 @@ export function Navbar() {
           </div>
         </div>
       </header>
+
+      {/* Mobile/Tablet Search Bar Expansion (visible on viewports < lg when active) */}
+      {isSearchOpen && (
+        <div className="lg:hidden border-b border-border bg-card px-4 py-3 animate-fade-in select-none">
+          <form onSubmit={handleSearchSubmit} className="relative w-full">
+            <input
+              type="text"
+              placeholder="Search products..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full h-10 pl-10 pr-4 rounded-lg border border-input bg-muted/40 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-all"
+              autoFocus
+            />
+            <Search className="absolute left-3.5 top-3 w-4 h-4 text-muted-foreground" />
+          </form>
+        </div>
+      )}
 
       {/* Side Cart Drawer */}
       <SideCartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
