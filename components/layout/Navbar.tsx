@@ -7,11 +7,20 @@ import { ShoppingBag, Search, User, Menu, LogOut, LayoutDashboard } from 'lucide
 import { useCart } from '@/lib/hooks/useCart';
 import { createClient } from '@/lib/supabase/client';
 import { logoutAction } from '@/lib/actions/actions';
-import { SideCartDrawer } from './SideCartDrawer';
-import { MobileMenu } from './MobileMenu';
+import dynamic from 'next/dynamic';
 import { Button } from '@/components/ui/Button';
 import { Logo } from './Logo';
 import { buildProductsSearchPath, ROUTES } from '@/lib/utils/routes';
+
+const SideCartDrawer = dynamic(
+  () => import('./SideCartDrawer').then((mod) => mod.SideCartDrawer),
+  { ssr: false }
+);
+
+const MobileMenu = dynamic(
+  () => import('./MobileMenu').then((mod) => mod.MobileMenu),
+  { ssr: false }
+);
 
 export function Navbar() {
   const router = useRouter();
@@ -19,6 +28,7 @@ export function Navbar() {
   const { items, fetchCart, clearCart } = useCart();
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -29,39 +39,53 @@ export function Navbar() {
   useEffect(() => {
     // Get initial session
     const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        setUser(session.user);
-        // Fetch profile
-        const { data: p } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
-        setProfile(p);
-        fetchCart(session.user.id);
-      } else {
-        fetchCart(null);
+      setIsAuthLoading(true);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          setUser(session.user);
+          // Fetch profile
+          const { data: p } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+          setProfile(p);
+          fetchCart(session.user.id);
+        } else {
+          fetchCart(null);
+        }
+      } catch (err) {
+        console.error('Error fetching session:', err);
+      } finally {
+        setIsAuthLoading(false);
       }
     };
     getSession();
 
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session) {
-        setUser(session.user);
-        const { data: p } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
-        setProfile(p);
-        fetchCart(session.user.id);
-      } else {
-        setUser(null);
-        setProfile(null);
-        clearCart();
-        fetchCart(null);
+      setIsAuthLoading(true);
+      try {
+        if (session) {
+          setUser(session.user);
+          const { data: p } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+          setProfile(p);
+          fetchCart(session.user.id);
+        } else {
+          setUser(null);
+          setProfile(null);
+          clearCart();
+          fetchCart(null);
+        }
+      } catch (err) {
+        console.error('Error on auth state change:', err);
+      } finally {
+        setIsAuthLoading(false);
       }
     });
 
@@ -157,7 +181,9 @@ export function Navbar() {
 
             {/* Account Management Desktop (Full text on xl and above) */}
             <div className="hidden xl:block">
-              {user ? (
+              {isAuthLoading ? (
+                <div className="h-9 w-[70px] bg-muted/60 animate-pulse rounded-lg" />
+              ) : user ? (
                 <div className="flex items-center gap-3">
                   {profile?.role === 'admin' && (
                     <Button href={ROUTES.admin} variant="ghost" size="sm" className="h-9 px-3 gap-2">
@@ -180,7 +206,9 @@ export function Navbar() {
 
             {/* Account Management Tablet (Icon only on lg to xl) */}
             <div className="hidden lg:block xl:hidden">
-              {user ? (
+              {isAuthLoading ? (
+                <div className="h-9 w-9 bg-muted/60 animate-pulse rounded-lg" />
+              ) : user ? (
                 <div className="flex items-center gap-1">
                   {profile?.role === 'admin' && (
                     <Button href={ROUTES.admin} variant="ghost" size="icon" className="h-9 w-9" title="Admin Dashboard">

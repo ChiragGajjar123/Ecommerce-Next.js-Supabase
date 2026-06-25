@@ -11,7 +11,12 @@ import { useCart } from '@/lib/hooks/useCart';
 import { useWishlist } from '@/lib/hooks/useWishlist';
 import { toast } from '@/components/ui/Toast';
 import { Product } from '@/types';
-import { QuickViewModal } from './QuickViewModal';
+import dynamic from 'next/dynamic';
+
+const QuickViewModal = dynamic(
+  () => import('./QuickViewModal').then((mod) => mod.QuickViewModal),
+  { ssr: false }
+);
 
 interface ProductCardProps {
   product: Product;

@@ -33,6 +33,7 @@ export default async function Home() {
           alt="Luxury fashion background"
           fill
           priority
+          quality={80}
           sizes="100vw"
           className="object-cover opacity-85 select-none"
         />

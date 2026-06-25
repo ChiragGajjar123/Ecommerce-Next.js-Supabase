@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { updateSession } from '@/lib/supabase/middleware';
 
 export async function proxy(request: NextRequest) {
-  const { supabase, response, user } = await updateSession(request);
+  const { response, user } = await updateSession(request);
   const pathname = request.nextUrl.pathname;
 
   // Redirect authenticated users away from auth pages (login, register, etc.)
@@ -30,19 +30,6 @@ export async function proxy(request: NextRequest) {
       const url = request.nextUrl.clone();
       url.pathname = '/auth/login';
       url.searchParams.set('redirect', pathname);
-      return NextResponse.redirect(url);
-    }
-
-    // Fetch the user's role from the profiles table
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-
-    if (!profile || profile.role !== 'admin') {
-      const url = request.nextUrl.clone();
-      url.pathname = '/';
       return NextResponse.redirect(url);
     }
   }
