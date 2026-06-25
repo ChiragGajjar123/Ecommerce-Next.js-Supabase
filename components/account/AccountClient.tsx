@@ -316,12 +316,12 @@ export function AccountClient({ profile, orders, wishlist, user, initialAddresse
                   {addresses.map((address) => (
                     <div
                       key={address.id}
-                      className={`relative border bg-card rounded-xl p-6 shadow-xs flex flex-col justify-between transition-all ${
+                      className={`relative border bg-card rounded-xl shadow-xs flex flex-col justify-between transition-all overflow-hidden ${
                         address.is_default ? 'border-primary bg-primary/[0.02]' : 'border-border'
                       }`}
                     >
                       {/* Address Card Details */}
-                      <div>
+                      <div className="p-6">
                         <div className="flex justify-between items-start gap-4 mb-3">
                           <span className="font-bold text-sm text-foreground uppercase tracking-tight block">
                             {address.full_name}
@@ -344,7 +344,7 @@ export function AccountClient({ profile, orders, wishlist, user, initialAddresse
                       </div>
 
                       {/* Card Actions */}
-                      <div className="flex gap-2 justify-end border-t border-border pt-4 mt-6 select-none shrink-0">
+                      <div className="flex gap-2 justify-end bg-muted/40 border-t border-border px-6 py-4 select-none shrink-0">
                         {!address.is_default && (
                           <Button
                             variant="outline"
